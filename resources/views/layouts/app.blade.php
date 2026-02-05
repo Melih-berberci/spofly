@@ -2,10 +2,18 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta name="description" content="{{ $pageDescription ?? 'Haftalık indirimler ve kampanyalar' }}">
     <meta name="keywords" content="indirim, kampanya, haftalık indirimler, fırsat">
     <meta name="robots" content="index, follow">
+    
+    <!-- Mobile App Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Spofly">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#ffffff">
     
     <!-- Open Graph / Social Media -->
     <meta property="og:title" content="{{ $pageTitle ?? 'Haftanın İndirimleri' }}">
@@ -31,31 +39,52 @@
     
     <!-- Custom Styles -->
     <style>
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
+        /* Base Reset & Mobile Optimization */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
-        /* Mobile app feel */
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+        
         body {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            touch-action: manipulation;
+            overscroll-behavior-y: contain;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
         }
         
-        /* Card hover animation */
+        @supports (-webkit-touch-callout: none) {
+            body { min-height: -webkit-fill-available; }
+        }
+        
+        /* Safe Area Support */
+        .safe-area-top { padding-top: env(safe-area-inset-top, 0px); }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+        .safe-area-left { padding-left: env(safe-area-inset-left, 0px); }
+        .safe-area-right { padding-right: env(safe-area-inset-right, 0px); }
+        
+        /* Card Interactions */
         .discount-card {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
         
-        .discount-card:hover {
-            transform: translateY(-4px);
+        @media (hover: hover) and (pointer: fine) {
+            .discount-card:hover { transform: translateY(-4px); }
         }
         
-        /* Price strikethrough animation */
-        .old-price {
-            position: relative;
-        }
+        .discount-card:active { transform: scale(0.98); }
         
+        /* Old Price */
+        .old-price { position: relative; }
         .old-price::after {
             content: '';
             position: absolute;
@@ -66,33 +95,47 @@
             background: #9ca3af;
         }
         
-        /* Filter button active state */
-        .filter-btn.active {
-            background-color: #dc2626;
-            color: white;
-        }
+        /* Filter Buttons */
+        .filter-btn { -webkit-user-select: none; user-select: none; }
+        .filter-btn.active { background-color: #dc2626; color: white; }
+        .filter-btn:active { transform: scale(0.95); }
         
-        /* Discount badge pulse */
+        /* Discount Badge */
         @keyframes pulse-discount {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
+        .discount-badge { animation: pulse-discount 2s infinite; }
         
-        .discount-badge {
-            animation: pulse-discount 2s infinite;
+        /* Touch-friendly */
+        button, .btn { min-height: 44px; min-width: 44px; cursor: pointer; }
+        
+        /* Hide scrollbar */
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Small screens */
+        @media (max-width: 375px) {
+            .text-xl { font-size: 1.125rem; }
+            .p-4 { padding: 0.75rem; }
+            .discount-badge { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
         }
         
-        /* Safe area for mobile devices */
-        .safe-area-top {
-            padding-top: env(safe-area-inset-top);
+        /* Landscape phones */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sticky { position: relative; }
         }
         
-        .safe-area-bottom {
-            padding-bottom: env(safe-area-inset-bottom);
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen safe-area-top safe-area-bottom">
+<body class="bg-gray-50 min-h-screen safe-area-top safe-area-bottom safe-area-left safe-area-right">
     <!-- Fixed Header -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4">
