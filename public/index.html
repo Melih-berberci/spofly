@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="description" content="Haftalık indirimler ve kampanyalar - En güncel fırsatları kaçırmayın!">
+    <meta name="keywords" content="indirim, kampanya, haftalık indirimler, fırsat">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Mobile App Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Spofly">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#ffffff">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Haftanın İndirimleri">
+    <meta property="og:description" content="En güncel indirimler ve kampanyalar">
+    <meta property="og:type" content="website">
+    
+    <title>Haftanın İndirimleri | Spofly</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#dc2626',
+                        'primary-dark': '#b91c1c',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Base Reset & Mobile Optimization */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+        
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            touch-action: manipulation;
+            overscroll-behavior-y: contain;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
+        
+        /* iOS Safari 100vh fix */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                min-height: -webkit-fill-available;
+            }
+        }
+        
+        /* Safe Area Support (iPhone X+, Android notch) */
+        .safe-area-top {
+            padding-top: env(safe-area-inset-top, 0px);
+        }
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .safe-area-left {
+            padding-left: env(safe-area-inset-left, 0px);
+        }
+        .safe-area-right {
+            padding-right: env(safe-area-inset-right, 0px);
+        }
+        
+        /* Card Interactions */
+        .discount-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: transform;
+        }
+        
+        @media (hover: hover) and (pointer: fine) {
+            .discount-card:hover {
+                transform: translateY(-4px);
+            }
+        }
+        
+        /* Touch feedback for mobile */
+        .discount-card:active {
+            transform: scale(0.98);
+        }
+        
+        /* Old Price Strikethrough */
+        .old-price {
+            position: relative;
+        }
+        .old-price::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 2px;
+            background: #9ca3af;
+        }
+        
+        /* Filter Button States */
+        .filter-btn {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .filter-btn.active {
+            background-color: #dc2626;
+            color: white;
+        }
+        .filter-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Discount Badge Animation */
+        @keyframes pulse-discount {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .discount-badge {
+            animation: pulse-discount 2s infinite;
+        }
+        
+        /* Touch-friendly buttons */
+        button, .btn {
+            min-height: 44px;
+            min-width: 44px;
+            cursor: pointer;
+        }
+        
+        /* Horizontal scroll without scrollbar (filter) */
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Very small screens (iPhone SE, older devices) */
+        @media (max-width: 375px) {
+            .text-xl { font-size: 1.125rem; }
+            .text-2xl { font-size: 1.25rem; }
+            .p-4 { padding: 0.75rem; }
+            .gap-4 { gap: 0.75rem; }
+            .discount-badge { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+        }
+        
+        /* Small screens (iPhone 12 mini, etc) */
+        @media (max-width: 390px) {
+            .product-btn-text { font-size: 0.875rem; }
+        }
+        
+        /* Landscape mode on phones */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sticky { position: relative; }
+            #discountsGrid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        /* Tablet landscape */
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+            #discountsGrid { grid-template-columns: repeat(3, 1fr); }
+        }
+        
+        /* Large tablets and desktop */
+        @media (min-width: 1024px) {
+            #discountsGrid { grid-template-columns: repeat(3, 1fr); }
+        }
+        
+        @media (min-width: 1280px) {
+            #discountsGrid { grid-template-columns: repeat(4, 1fr); }
+        }
+        
+        /* Modal mobile optimization */
+        #productModal .modal-content {
+            max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem);
+            max-height: calc(100dvh - 2rem);
+        }
+        
+        /* Smooth image loading */
+        img {
+            content-visibility: auto;
+        }
+        
+        /* Prevent pull-to-refresh on modal */
+        .modal-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .discount-badge { border: 2px solid white; }
+            .filter-btn { border-width: 2px; }
+        }
+        
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Dark mode support (optional) */
+        @media (prefers-color-scheme: dark) {
+            /* Uncomment for dark mode
+            body { background: #111827; color: #f9fafb; }
+            .bg-white { background: #1f2937; }
+            .text-gray-900 { color: #f9fafb; }
+            */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen safe-area-top safe-area-bottom safe-area-left safe-area-right">
+    <!-- Fixed Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="#" class="flex items-center gap-2">
+                    <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+                    </svg>
+                    <h1 class="text-xl font-bold text-gray-900">Spofly</h1>
+                </a>
+                <span class="text-sm text-gray-500" id="currentDate"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Page Header -->
+        <section class="mb-6">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Haftanın İndirimleri</h2>
+            <p class="text-gray-600">En güncel indirimler ve kampanyalar. Kaçırmayın!</p>
+        </section>
+
+        <!-- Category Filter -->
+        <section class="mb-6 overflow-x-auto pb-2 hide-scrollbar -mx-4 px-4" aria-label="Kategori filtreleri">
+            <div class="flex gap-2 min-w-max">
+                <button onclick="filterByCategory('all')" class="filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors bg-primary text-white" data-category="all">
+                    Tümü
+                </button>
+                <button onclick="filterByCategory('Elektronik')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white text-gray-700 hover:bg-gray-100 border border-gray-200" data-category="Elektronik">
+                    Elektronik
+                </button>
+                <button onclick="filterByCategory('Giyim')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white text-gray-700 hover:bg-gray-100 border border-gray-200" data-category="Giyim">
+                    Giyim
+                </button>
+                <button onclick="filterByCategory('Ev & Yaşam')" class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors bg-white text-gray-700 hover:bg-gray-100 border border-gray-200" data-category="Ev & Yaşam">
+                    Ev & Yaşam
+                </button>
+            </div>
+        </section>
+
+        <!-- Discounts Grid -->
+        <section id="discountsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" aria-label="İndirimli ürünler">
+            <!-- Products will be rendered here by JavaScript -->
+        </section>
+        
+        <!-- Results Count -->
+        <p id="resultsCount" class="text-center text-gray-500 text-sm mt-6"></p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-auto py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+            <p>&copy; 2024 Spofly. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4 safe-area-top safe-area-bottom" style="padding-top: max(1rem, env(safe-area-inset-top)); padding-bottom: max(1rem, env(safe-area-inset-bottom));">
+        <div class="bg-white rounded-2xl max-w-2xl w-full overflow-y-auto overscroll-contain" style="max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 2rem); max-height: calc(100dvh - 2rem);">
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sample product data (simulates data from Laravel controller)
+        const products = [
+            {
+                id: 1,
+                name: 'Apple iPhone 15 Pro Max 256GB',
+                category: 'Elektronik',
+                description: 'A17 Pro çip, titanium tasarım, 48MP ana kamera sistemi ile en gelişmiş iPhone deneyimi.',
+                originalPrice: 74999.00,
+                discountedPrice: 64999.00,
+                discountPercentage: 13,
+                image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=500',
+                remainingTime: '5 gün kaldı'
+            },
+            {
+                id: 2,
+                name: 'Samsung 65" QLED 4K Smart TV',
+                category: 'Elektronik',
+                description: 'Quantum Dot teknolojisi ile milyarlarca renk ve nefes kesici görüntü kalitesi.',
+                originalPrice: 45999.00,
+                discountedPrice: 34999.00,
+                discountPercentage: 24,
+                image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=500',
+                remainingTime: '3 gün kaldı'
+            },
+            {
+                id: 3,
+                name: 'Nike Air Max 270 Spor Ayakkabı',
+                category: 'Giyim',
+                description: 'Max Air ünitesi ile üstün konfor ve şık tasarım bir arada.',
+                originalPrice: 4299.00,
+                discountedPrice: 2899.00,
+                discountPercentage: 33,
+                image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500',
+                remainingTime: '4 gün kaldı'
+            },
+            {
+                id: 4,
+                name: 'Dyson V15 Detect Kablosuz Süpürge',
+                category: 'Ev & Yaşam',
+                description: 'Lazer toz algılama ve LCD ekran ile akıllı temizlik deneyimi.',
+                originalPrice: 29999.00,
+                discountedPrice: 22999.00,
+                discountPercentage: 23,
+                image: 'https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500',
+                remainingTime: '6 gün kaldı'
+            },
+            {
+                id: 5,
+                name: 'Sony WH-1000XM5 Kulaklık',
+                category: 'Elektronik',
+                description: 'Sınıfının en iyi gürültü engelleme özelliği ve 30 saat pil ömrü.',
+                originalPrice: 12999.00,
+                discountedPrice: 9499.00,
+                discountPercentage: 27,
+                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
+                remainingTime: '2 gün kaldı'
+            },
+            {
+                id: 6,
+                name: 'Adidas Ultraboost Light Koşu Ayakkabısı',
+                category: 'Giyim',
+                description: 'BOOST teknolojisi ile enerji dönüşümü ve hafif yapı.',
+                originalPrice: 5499.00,
+                discountedPrice: 3999.00,
+                discountPercentage: 27,
+                image: 'https://images.unsplash.com/photo-1556048219-bb6978360b84?w=500',
+                remainingTime: '5 gün kaldı'
+            },
+            {
+                id: 7,
+                name: 'De\'Longhi Magnifica Kahve Makinesi',
+                category: 'Ev & Yaşam',
+                description: 'Otomatik espresso ve cappuccino hazırlama, entegre öğütücü.',
+                originalPrice: 24999.00,
+                discountedPrice: 17999.00,
+                discountPercentage: 28,
+                image: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=500',
+                remainingTime: '4 gün kaldı'
+            },
+            {
+                id: 8,
+                name: 'Apple MacBook Air M3 256GB',
+                category: 'Elektronik',
+                description: 'M3 çip ile inanılmaz performans, 18 saate kadar pil ömrü.',
+                originalPrice: 54999.00,
+                discountedPrice: 47999.00,
+                discountPercentage: 13,
+                image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500',
+                remainingTime: '7 gün kaldı'
+            },
+            {
+                id: 9,
+                name: 'Levi\'s 501 Original Fit Jean',
+                category: 'Giyim',
+                description: 'Klasik kesim, %100 pamuk, zamansız stil.',
+                originalPrice: 2499.00,
+                discountedPrice: 1699.00,
+                discountPercentage: 32,
+                image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500',
+                remainingTime: '3 gün kaldı'
+            },
+            {
+                id: 10,
+                name: 'Philips Airfryer XXL Premium',
+                category: 'Ev & Yaşam',
+                description: '7.3L kapasite, yağsız kızartma teknolojisi, akıllı sensör.',
+                originalPrice: 8999.00,
+                discountedPrice: 5999.00,
+                discountPercentage: 33,
+                image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500',
+                remainingTime: '5 gün kaldı'
+            },
+            {
+                id: 11,
+                name: 'JBL Charge 5 Bluetooth Hoparlör',
+                category: 'Elektronik',
+                description: 'IP67 su geçirmez, 20 saat çalma süresi, powerbank özelliği.',
+                originalPrice: 4999.00,
+                discountedPrice: 3499.00,
+                discountPercentage: 30,
+                image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500',
+                remainingTime: '2 gün kaldı'
+            },
+            {
+                id: 12,
+                name: 'The North Face Thermoball Eco Mont',
+                category: 'Giyim',
+                description: 'Geri dönüştürülmüş malzemeler, hafif ısı yalıtımı.',
+                originalPrice: 6999.00,
+                discountedPrice: 4899.00,
+                discountPercentage: 30,
+                image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500',
+                remainingTime: '6 gün kaldı'
+            }
+        ];
+
+        // Format price with Turkish locale
+        function formatPrice(price) {
+            return price.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺';
+        }
+
+        // Render product card
+        function renderProductCard(product) {
+            return `
+                <article class="discount-card bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden" itemscope itemtype="https://schema.org/Product">
+                    <div class="relative aspect-square bg-gray-100">
+                        <img src="${product.image}" 
+                             alt="${product.name}" 
+                             class="w-full h-full object-cover"
+                             loading="lazy"
+                             itemprop="image"
+                             onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center\\'><svg class=\\'w-20 h-20 text-gray-300\\' fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'1.5\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z\\'/></svg></div>'">
+                        
+                        <span class="discount-badge absolute top-3 left-3 bg-primary text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                            %${product.discountPercentage} İNDİRİM
+                        </span>
+                        
+                        <span class="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+                            ${product.remainingTime}
+                        </span>
+                    </div>
+                    
+                    <div class="p-4">
+                        <span class="text-xs text-gray-500 uppercase tracking-wide">${product.category}</span>
+                        
+                        <h3 class="font-semibold text-gray-900 mt-1 mb-3 line-clamp-2" itemprop="name">
+                            ${product.name}
+                        </h3>
+                        
+                        <div class="flex items-center gap-3 mb-4" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                            <span class="old-price text-gray-400 text-sm">
+                                ${formatPrice(product.originalPrice)}
+                            </span>
+                            <span class="text-primary text-xl font-bold" itemprop="price" content="${product.discountedPrice}">
+                                ${formatPrice(product.discountedPrice)}
+                            </span>
+                            <meta itemprop="priceCurrency" content="TRY">
+                            <meta itemprop="availability" content="https://schema.org/InStock">
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button onclick="showProductDetail(${product.id})" 
+                               class="flex-1 bg-gray-100 active:bg-gray-300 hover:bg-gray-200 text-gray-800 text-center py-3 rounded-xl font-medium transition-colors product-btn-text select-none">
+                                İncele
+                            </button>
+                            <button type="button" 
+                                    class="flex-1 bg-primary active:bg-red-700 hover:bg-primary-dark text-white py-3 rounded-xl font-medium transition-colors product-btn-text select-none"
+                                    onclick="addToCart(${product.id}, this)">
+                                Sepete Ekle
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        // Filter products by category
+        let currentCategory = 'all';
+        
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-primary', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-200');
+            });
+            
+            const activeBtn = document.querySelector(`[data-category="${category}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'bg-primary', 'text-white');
+                activeBtn.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-200');
+            }
+            
+            renderProducts();
+        }
+
+        // Render products
+        function renderProducts() {
+            const filteredProducts = currentCategory === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentCategory);
+            
+            const grid = document.getElementById('discountsGrid');
+            grid.innerHTML = filteredProducts.map(renderProductCard).join('');
+            
+            document.getElementById('resultsCount').textContent = 
+                `${filteredProducts.length} indirimli ürün listeleniyor`;
+        }
+
+        // Add to cart
+        function addToCart(productId, btn) {
+            const originalText = btn.innerText;
+            
+            btn.disabled = true;
+            btn.innerText = 'Eklendi ✓';
+            btn.classList.remove('bg-primary', 'hover:bg-primary-dark');
+            btn.classList.add('bg-green-500');
+            
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerText = originalText;
+                btn.classList.remove('bg-green-500');
+                btn.classList.add('bg-primary', 'hover:bg-primary-dark');
+            }, 2000);
+            
+            console.log('Ürün sepete eklendi:', productId);
+        }
+
+        // Show product detail modal
+        function showProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const savings = product.originalPrice - product.discountedPrice;
+            
+            document.getElementById('modalContent').innerHTML = `
+                <div class="relative">
+                    <button onclick="closeModal()" class="absolute top-4 right-4 z-10 bg-white/80 hover:bg-white rounded-full p-2 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="md:flex">
+                        <div class="md:w-1/2 relative">
+                            <div class="aspect-square bg-gray-100">
+                                <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
+                            </div>
+                            <span class="discount-badge absolute top-4 left-4 bg-primary text-white text-lg font-bold px-4 py-2 rounded-full shadow-lg">
+                                %${product.discountPercentage} İNDİRİM
+                            </span>
+                        </div>
+                        
+                        <div class="md:w-1/2 p-6 md:p-8 flex flex-col">
+                            <span class="text-sm text-gray-500 uppercase tracking-wide mb-2">${product.category}</span>
+                            
+                            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">${product.name}</h2>
+                            
+                            <p class="text-gray-600 mb-6">${product.description}</p>
+                            
+                            <div class="flex items-end gap-4 mb-6">
+                                <div>
+                                    <span class="block text-sm text-gray-500 mb-1">Eski Fiyat</span>
+                                    <span class="old-price text-gray-400 text-xl">${formatPrice(product.originalPrice)}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-sm text-primary mb-1">İndirimli Fiyat</span>
+                                    <span class="text-primary text-3xl font-bold">${formatPrice(product.discountedPrice)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+                                <p class="text-green-700 font-medium">
+                                    💰 ${formatPrice(savings)} tasarruf ediyorsunuz!
+                                </p>
+                            </div>
+                            
+                            <div class="flex items-center gap-2 text-gray-600 mb-6">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>${product.remainingTime}</span>
+                            </div>
+                            
+                            <button type="button" 
+                                    class="w-full bg-primary hover:bg-primary-dark text-white py-4 rounded-xl font-semibold text-lg transition-colors mt-auto"
+                                    onclick="addToCartFromModal(${product.id}, this)">
+                                Sepete Ekle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const modal = document.getElementById('productModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.classList.add('modal-open');
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+            document.body.style.top = `-${window.scrollY}px`;
+        }
+
+        function addToCartFromModal(productId, btn) {
+            addToCart(productId, btn);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('productModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            
+            const scrollY = document.body.style.top;
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.top = '';
+            window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('productModal').addEventListener('click', (e) => {
+            if (e.target.id === 'productModal') {
+                closeModal();
+            }
+        });
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Set current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('tr-TR', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        // Initial render
+        renderProducts();
+        
+        // Prevent iOS bounce scroll
+        document.body.addEventListener('touchmove', function(e) {
+            if (document.body.classList.contains('modal-open')) {
+                const modal = document.getElementById('productModal');
+                const modalContent = modal.querySelector('.bg-white');
+                if (!modalContent.contains(e.target)) {
+                    e.preventDefault();
+                }
+            }
+        }, { passive: false });
+        
+        // Handle orientation change
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 100);
+        });
+        
+        // Service Worker for PWA (optional)
+        if ('serviceWorker' in navigator) {
+            // Uncomment to enable PWA
+            // navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
+</body>
+</html>
